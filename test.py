@@ -19,7 +19,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn import metrics
 # to handle data in form of rows and columns 
-import pandas as pd    
+import pandas as pd
 # importing ploting libraries
 import matplotlib.pyplot as plt 
 from scipy.stats import zscore
@@ -112,8 +112,8 @@ y = powerPlant['Power']
 def calc_train_error(X_train, y_train, model, scaler=None):
     predictions = model.predict(X_train)
     if scaler is not None:
-        y_train = scaler.inverse_transform(y_train)
-        predictions = scaler.inverse_transform(predictions)
+        y_train = scaler.inverse_transform(y_train.reshape(-1, 1))
+        predictions = scaler.inverse_transform(predictions.reshape(-1, 1))
     mse = mean_squared_error(y_train, predictions)
     rmse = np.sqrt(mse)
     mae = mean_absolute_error(y_train, predictions)
@@ -122,8 +122,9 @@ def calc_train_error(X_train, y_train, model, scaler=None):
 def calc_validation_error(X_test, y_test, model, scaler=None):
     predictions = model.predict(X_test)
     if scaler is not None:
-        y_test = scaler.inverse_transform(y_test)
-        predictions = scaler.inverse_transform(predictions)
+        y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
+        predictions = scaler.inverse_transform(predictions.reshape(-1, 1))
+
     mse = mean_squared_error(y_test, predictions)
     rmse = np.sqrt(mse)
     mae = mean_absolute_error(y_test, predictions)
@@ -159,6 +160,9 @@ def run_kfold_poly(k, lr_or_rf=True):
             # Split data
             x_train, x_val = x_poly[train_index], x_poly[val_index]
             y_train, y_val = y[train_index], y[val_index]
+            if isinstance(model, RandomForestRegressor):
+                y_train = y_train.ravel()
+                y_val = y_val.ravel()
             model.fit(x_train, y_train)
             # Calculate Error
             train_error, val_error = calc_metrics(x_train, y_train, x_val, y_val, model)
@@ -207,6 +211,9 @@ def run_kfold_scale(k, lr_or_rf=True, min_max_or_standar=True):
         # Split data
         x_train, x_val = x_scale[train_index], x_scale[val_index]
         y_train, y_val = y_scale[train_index], y_scale[val_index]
+        if isinstance(model, RandomForestRegressor):
+            y_train = y_train.ravel()
+            y_val = y_val.ravel()
         model.fit(x_train, y_train)
         # Calculate Error
 
@@ -239,7 +246,7 @@ def run_kfold_scale(k, lr_or_rf=True, min_max_or_standar=True):
 if __name__ == "__main__":
     run_kfold_poly(k=10, lr_or_rf=True)
     run_kfold_poly(k=10, lr_or_rf=False)
-    run_kfold_scale(k=10, r_or_rf=True, min_max_or_standar=True)
-    run_kfold_scale(k=10, r_or_rf=False, min_max_or_standar=True)
-    run_kfold_scale(k=10, r_or_rf=True, min_max_or_standar=False)
-    run_kfold_scale(k=10, r_or_rf=False, min_max_or_standar=False)
+    run_kfold_scale(k=10, lr_or_rf=True, min_max_or_standar=True)
+    run_kfold_scale(k=10, lr_or_rf=False, min_max_or_standar=True)
+    run_kfold_scale(k=10, lr_or_rf=True, min_max_or_standar=False)
+    run_kfold_scale(k=10, lr_or_rf=False, min_max_or_standar=False)
