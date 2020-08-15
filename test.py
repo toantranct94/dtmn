@@ -138,6 +138,7 @@ def calc_metrics(X_train, y_train, X_test, y_test, model, scaler=None):
     validation_error = calc_validation_error(X_test, y_test, model, scaler)
     return train_error, validation_error
 
+# Run kfolds with Polynomial Features
 def run_kfold_poly(k, lr_or_rf=True):
     degrees = [1,2,3,4,5,6]
     kf = KFold(n_splits=k, shuffle = True)
@@ -183,7 +184,11 @@ def run_kfold_poly(k, lr_or_rf=True):
         print("DEGREE: {}".format(degree))
         print("TRAINING RMSE: {} ------ VAL RMSE {}".format(round(np.mean(total_train_rmse), 4), round(np.mean(total_val_rmse), 4)))
         print("TRAINING MAE: {} ------ VAL MAE {}".format(round(np.mean(total_train_mae), 4), round(np.mean(total_val_mae), 4)))
+        
+        plt.plot(y_train, y_val, color='red')
+        plt.show()
 
+# Run kfolds with Standared or MinMax Scaler
 def run_kfold_scale(k, lr_or_rf=True, min_max_or_standar=True):
     kf = KFold(n_splits=k, shuffle = True)
     x_array = np.asarray(x)
@@ -244,9 +249,9 @@ def run_kfold_scale(k, lr_or_rf=True, min_max_or_standar=True):
 
 
 if __name__ == "__main__":
-    run_kfold_poly(k=10, lr_or_rf=True)
-    run_kfold_poly(k=10, lr_or_rf=False)
+    #run_kfold_poly(k=10, lr_or_rf=True)
+    #run_kfold_poly(k=10, lr_or_rf=False)
     run_kfold_scale(k=10, lr_or_rf=True, min_max_or_standar=True)
-    run_kfold_scale(k=10, lr_or_rf=False, min_max_or_standar=True)
-    run_kfold_scale(k=10, lr_or_rf=True, min_max_or_standar=False)
-    run_kfold_scale(k=10, lr_or_rf=False, min_max_or_standar=False)
+    #run_kfold_scale(k=10, lr_or_rf=False, min_max_or_standar=True)
+    #run_kfold_scale(k=10, lr_or_rf=True, min_max_or_standar=False)
+    #(k=10, lr_or_rf=False, min_max_or_standar=False)
